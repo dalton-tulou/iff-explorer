@@ -462,7 +462,8 @@ function BitmapCanvas({
     if (canvas.current) {
       const ctx = canvas.current.getContext("2d");
       if (ctx) {
-        const imageData = new ImageData(bitmap, width, height);
+        const imageDataArray = new Uint8ClampedArray(bitmap);
+        const imageData = new ImageData(imageDataArray, width, height);
         ctx.putImageData(imageData, 0, 0);
       }
     }
