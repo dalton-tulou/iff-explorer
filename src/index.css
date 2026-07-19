@@ -69,7 +69,8 @@ body {
 }
 
 h1,
-h2 {
+h2,
+h3 {
   font-family: var(--heading);
   font-weight: 500;
   color: var(--text-h);
@@ -95,6 +96,13 @@ h2 {
   @media (max-width: 1024px) {
     font-size: 20px;
   }
+}
+
+h3 {
+  text-align: left;
+  font-size: 20px;
+  line-height: 118%;
+  letter-spacing: -0.2px;
 }
 
 p {
