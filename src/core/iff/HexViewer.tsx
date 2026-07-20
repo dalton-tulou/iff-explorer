@@ -11,13 +11,20 @@ export default function HexViewer({ chunk }: { chunk: IffChunk }) {
   }
 
   const bytesPerRow = 16;
-  const rows: JSX.Element[] = [];
+  const rows: string[] = [];
   for (let i = 0; i < hexValues.length; i += bytesPerRow) {
     const rowValues = hexValues.slice(i, i + bytesPerRow);
     rows.push(
-      <div key={i}>
-        {i.toString(16).padStart(8, "0")}: {rowValues.join(" ")}
-      </div>,
+      i.toString(16).padStart(8, "0") +
+        `: ` +
+        rowValues.join(" ").padEnd(3 * bytesPerRow, "\u00A0") +
+        rowValues
+          .map((hex) => {
+            const byte = parseInt(hex, 16);
+            return byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ".";
+          })
+          .join("") +
+        `\n`,
     );
   }
 

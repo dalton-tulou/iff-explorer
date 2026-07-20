@@ -58,7 +58,11 @@ export default function IffViewer({
             ) : (
               <plugin.fileViewer file={iff} />
             )
-          ) : null}
+          ) : selectedChunk ? (
+            <HexViewer chunk={selectedChunk} />
+          ) : (
+            <p>Unsupported file type: {iff.formType}</p>
+          )}
         </div>
       </div>
     </div>
