@@ -6,7 +6,7 @@ export interface FormatPlugin {
   name: string;
   supportedTypes: string[];
 
-  fileViewer: React.ComponentType<{ file: IffFile }>;
+  fileViewer?: React.ComponentType<{ file: IffFile }>;
   chunkViewers: Record<
     string,
     React.ComponentType<{ file: IffFile; chunk: IffChunk }>

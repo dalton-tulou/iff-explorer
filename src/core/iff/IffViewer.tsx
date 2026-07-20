@@ -55,8 +55,10 @@ export default function IffViewer({
                 plugin.chunkViewers[selectedChunk.id] ?? HexViewer,
                 { file: iff, chunk: selectedChunk },
               )
-            ) : (
+            ) : plugin.fileViewer ? (
               <plugin.fileViewer file={iff} />
+            ) : (
+              <p>Unsupported file type: {iff.formType}</p>
             )
           ) : selectedChunk ? (
             <HexViewer chunk={selectedChunk} />
