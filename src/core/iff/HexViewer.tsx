@@ -1,4 +1,3 @@
-import { type JSX } from "react";
 import type { IffChunk } from "../../core/iff/IffChunk";
 
 export default function HexViewer({ chunk }: { chunk: IffChunk }) {
