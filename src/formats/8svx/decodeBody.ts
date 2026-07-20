@@ -3,9 +3,9 @@ import type { IffChunk } from "../../core/iff/IffChunk";
 export default function decodeBody(
   chunk: IffChunk,
   compression: number,
-): Int8Array {
+): Int8Array | null {
   if (compression) {
-    throw new Error("Compressed 8SVX data is not supported yet.");
+    return null;
   }
 
   return new Int8Array(chunk.data);
