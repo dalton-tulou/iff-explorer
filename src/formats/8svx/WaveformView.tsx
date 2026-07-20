@@ -1,41 +1,36 @@
 import React from "react";
 import WaveSurfer from "wavesurfer.js";
+import Timeline from "wavesurfer.js/dist/plugins/timeline";
 
 interface WaveformProps {
-  waveform: Int8Array;
-  sr: number; // sample rate in Hz
+  waveform: Int8Array[];
+  sr: number;
 }
 
 export default function WaveformView({ waveform, sr }: WaveformProps) {
-  const containerRef = React.useRef<HTMLDivElement>(null);
   const wavesurferRef = React.useRef<WaveSurfer | null>(null);
-
   const [isPlaying, setIsPlaying] = React.useState(false);
 
   React.useEffect(() => {
-    if (!containerRef.current) return;
-
-    const audioBlob = pcmToWav(waveform, sr, 1);
+    const audioBlob = pcmToWav(waveform, sr);
     const audioUrl = URL.createObjectURL(audioBlob);
 
-    const peaks = new Float32Array(waveform.length);
-
-    for (let i = 0; i < waveform.length; i++) {
-      peaks[i] = waveform[i] / 128;
-    }
-
     const wavesurfer = WaveSurfer.create({
-      container: containerRef.current,
+      container: "#waveform",
       url: audioUrl,
       waveColor: "#999",
       progressColor: "#333",
-      height: 80,
-
-      // Required when using precomputed waveform data
-      duration: waveform.length / sr,
-      peaks: [peaks],
+      height: 128,
 
       interact: true,
+
+      splitChannels: [{ height: 64 }, { height: 64 }],
+
+      plugins: [
+        Timeline.create({
+          container: "#timeline",
+        }),
+      ],
     });
 
     wavesurferRef.current = wavesurfer;
@@ -58,16 +53,19 @@ export default function WaveformView({ waveform, sr }: WaveformProps) {
     <div>
       <button onClick={togglePlayback}>{isPlaying ? "Pause" : "Play"}</button>
 
-      <div ref={containerRef} />
+      <div id="waveform" />
+      <div id="timeline" />
     </div>
   );
 }
 
-function pcmToWav(samples: Int8Array, sampleRate: number, channels = 1): Blob {
+function pcmToWav(samples: Int8Array[], sampleRate: number): Blob {
   const bytesPerSample = 1;
+  const channels = samples.length;
+
   const blockAlign = channels * bytesPerSample;
   const byteRate = sampleRate * blockAlign;
-  const dataSize = samples.length;
+  const dataSize = samples.reduce((sum, channel) => sum + channel.length, 0);
   const buffer = new ArrayBuffer(44 + dataSize);
   const view = new DataView(buffer);
 
@@ -97,13 +95,12 @@ function pcmToWav(samples: Int8Array, sampleRate: number, channels = 1): Blob {
   view.setUint32(40, dataSize, true);
 
   // Copy PCM data
-  for (let i = 0; i < samples.length; i++) {
-    view.setInt8(44 + i, samples[i] + 128);
+  for (let ch = 0; ch < samples.length; ch++) {
+    const channel = samples[ch];
+    for (let i = 0; i < channel.length; i++) {
+      view.setInt8(44 + i * channels + ch, channel[i] + 128);
+    }
   }
-
-  // new Uint8Array(buffer, 44).set(
-  //   new Uint8Array(samples.buffer, samples.byteOffset, samples.byteLength),
-  // );
 
   return new Blob([buffer], { type: "audio/wav" });
 }
